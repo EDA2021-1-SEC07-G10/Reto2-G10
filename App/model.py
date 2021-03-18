@@ -46,6 +46,9 @@ def newCatalog():
     catalog = {"videos": None, "categories": None}
     catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
+    catalog["categories_map"] = mp.newMap(10000,
+                                   maptype='PROBING',
+                                   loadfactor=4.0)
 
     return catalog
 
@@ -54,15 +57,46 @@ def newCatalog():
 
 
 def addVideo(catalog, video):
-    # Se adiciona el video a la lista de videos
+    """
+    Esta funcion adiciona un video a la lista de videos,
+    adicionalmente lo guarda en un Map usando como llave su Id (categoría).
+    """
     lt.addLast(catalog['videos'], video)
+    mp.put(catalog['categories_map'], video['category_id'], video)
 
 
-def addCategory(catalog, category):
+def addCategory1(catalog, category):
     # Se adiciona la categoria a la lista de categorias
     lt.addLast(catalog['categories'], category)
 
+
+def addCategory2(catalog, category, mapvalue):
+    # Se adiciona la categoria al map de categorias
+    mp.put(catalog["categories_map"], category, mapvalue)
+
+
+def fixCategoriesMap(catalog):
+    for categ in catalog["categories_map"]["table"]["elements"]:
+        print(categ)
+        if categ["key"] == None:
+            mp.remove(catalog["categories_map"], categ["key"])
+
+
 # Funciones para creacion de datos
+
+def newCategory(name, id):
+    """
+    Esta estructura crea una relación entre las categorías y videos existentes
+    """
+    category = {'name': '',
+           'category_id': '',
+           'total_videos': 0,
+           'videos': None,
+           'count': 0.0}
+    category['name'] = name
+    category['category_id'] = id
+    category['videos'] = lt.newList()
+    return category
 
 # Funciones de consulta
 

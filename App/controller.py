@@ -50,25 +50,43 @@ def loadData(catalog):
 
 def loadVideos(catalog):
 
-    videosfile = (cf.data_dir + 'videos-large.csv').replace("\\","/")
+    videosfile = (cf.data_dir + 'videos-small.csv').replace("\\","/")
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     for video in input_file:
         model.addVideo(catalog, video)
 
+def findCategoryName(catalog, category):
+    for cat in catalog["categories"]["elements"]:
+        number = category['id\tname'][0].replace("\\", "")
+        if (number) in cat['id\tname']:
+            contents = cat['id\tname'].split("\t")
+            category_name = contents[1]
+            category_name = category_name.replace(" ", "")
+            category_id = contents[0]
+    return (category_name, category_id)
 
 def loadCategories(catalog):
 
     categoriesfile = cf.data_dir + 'category-id.csv'
     input_file = csv.DictReader(open(categoriesfile, encoding='utf-8'))
     for category in input_file:
-        model.addCategory(catalog, category)
+        model.addCategory1(catalog, category)
+        cat_contents = findCategoryName(catalog, category)
+        cat_name = cat_contents[0]
+        cat_id = cat_contents[1]
+        result = model.newCategory(cat_name, cat_id)
+        model.addCategory2(catalog, cat_name, result)
+    model.fixCategoriesMap(catalog)
+    
 
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
 
+
 def findCategoryId(catalog, category):
     for cat in catalog["categories"]["elements"]:
+        print(category)
         if (category.title()) in cat['id\tname']:
             contents = cat['id\tname'].split("\t")
             category_id = contents[0]

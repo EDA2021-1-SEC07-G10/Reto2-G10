@@ -189,6 +189,8 @@ while True:
         printVideoInfo(video)
         print("Las categorías cargadas y sus id son:")
         printCategoriesList(catalog)
+        #print(catalog["categories_map"])
+        
 
     elif int(inputs[0]) == 2:
         print("------------------------------------------------------")
