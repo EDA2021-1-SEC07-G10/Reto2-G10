@@ -29,10 +29,78 @@ import csv
 El controlador se encarga de mediar entre la vista y el modelo.
 """
 
-# Inicialización del Catálogo de libros
+# Inicialización del Catálogo de videos
+
+
+def initCatalog():
+
+    catalog = model.newCatalog()
+    return catalog
 
 # Funciones para la carga de datos
+
+
+def loadData(catalog):
+    """
+    Carga los datos de los archivos y estos a la estructura de datos
+    """
+    loadVideos(catalog)
+    loadCategories(catalog)
+
+
+def loadVideos(catalog):
+
+    videosfile = (cf.data_dir + 'videos-large.csv').replace("\\","/")
+    input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
+    for video in input_file:
+        model.addVideo(catalog, video)
+
+
+def loadCategories(catalog):
+
+    categoriesfile = cf.data_dir + 'category-id.csv'
+    input_file = csv.DictReader(open(categoriesfile, encoding='utf-8'))
+    for category in input_file:
+        model.addCategory(catalog, category)
 
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+
+def findCategoryId(catalog, category):
+    for cat in catalog["categories"]["elements"]:
+        if (category.title()) in cat['id\tname']:
+            contents = cat['id\tname'].split("\t")
+            category_id = contents[0]
+    return category_id
+
+
+def firstReq(catalog, data_size, country, category):
+    """
+    Solicita al model la información del requerimiento #1
+    """
+    idcat = findCategoryId(catalog, category)
+    return model.firstReq(catalog, data_size, country, idcat)
+
+
+def secondReq(catalog, country):
+    """
+    Solicita al model la información del requerimiento #2
+    """
+    return model.secondReq(catalog, country)
+
+
+def thirdReq(catalog, category):
+    """
+    Solicita al model la información del requerimiento #3
+    """
+    idcat = findCategoryId(catalog, category)
+    return model.thirdReq(catalog, idcat)
+
+
+def fourthReq(catalog, data_size, country, tag):
+    """
+    Solicita al model la información del requerimiento #4
+    """
+    return model.fourthReq(catalog, data_size, country, tag)
+
