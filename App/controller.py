@@ -55,6 +55,7 @@ def loadVideos(catalog):
     for video in input_file:
         model.addVideo(catalog, video)
 
+
 def findCategoryName(catalog, category):
     for cat in catalog["categories"]["elements"]:
         number = category['id\tname'][0].replace("\\", "")
@@ -65,8 +66,8 @@ def findCategoryName(catalog, category):
             category_id = contents[0]
     return (category_name, category_id)
 
-def loadCategories(catalog):
 
+def loadCategories(catalog):
     categoriesfile = cf.data_dir + 'category-id.csv'
     input_file = csv.DictReader(open(categoriesfile, encoding='utf-8'))
     for category in input_file:

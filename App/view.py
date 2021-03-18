@@ -39,11 +39,11 @@ def printMenu():
     print("------------------------------------------------------")
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Req. 1: Consultar n videos con más views en un país, por categoría")
-    print("3- Req. 2: Consultar video que más días ha sido trending en un país")
-    print("4- Req. 3: Consultar video que más dias ha sido trending, por categoría")
-    print("5- Req. 4: Consultar n videos con más likes en un país, por tag")
-    print("0- Salir")
+    #print("2- Req. 1: Consultar n videos con más views en un país, por categoría")
+    #print("3- Req. 2: Consultar video que más días ha sido trending en un país")
+    #print("4- Req. 3: Consultar video que más dias ha sido trending, por categoría")
+    #print("5- Req. 4: Consultar n videos con más likes en un país, por tag")
+    #print("0- Salir")
 
 
 def initCatalog():
