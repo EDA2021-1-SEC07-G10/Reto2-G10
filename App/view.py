@@ -57,7 +57,7 @@ def loadData(catalog):
     """
     Carga los videos en la estructura de datos
     """
-    controller.loadData(catalog)
+    return controller.loadData(catalog)
 
 
 def printVideoInfo(video):
@@ -182,14 +182,18 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
-        loadData(catalog)
+        mediciones = loadData(catalog)
+        print("Resultados prueba ---------------------------------------------------------")
+        print("Tiempo de ejecución: " + str(mediciones[0]) + "ms")
+        print("Consumo de datos: " + str(mediciones[1]) + "kB")
+        print("---------------------------------------------------------------------------")
         print('Videos cargados: ' + str(lt.size(catalog['videos'])))
         print("Información sobre el primer video cargado:\n")
         video = lt.firstElement(catalog["videos"])
         printVideoInfo(video)
         print("Las categorías cargadas y sus id son:")
         printCategoriesList(catalog)
-        #print(catalog["categories_map"])
+        
         
 
     elif int(inputs[0]) == 2:
