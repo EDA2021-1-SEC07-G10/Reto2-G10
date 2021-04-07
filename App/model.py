@@ -27,6 +27,7 @@
 
 import config as cf
 from DISClib.ADT import list as lt
+#from DISClib.DataStructures import mapstructure as mp
 from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
@@ -41,14 +42,12 @@ los mismos.
 
 
 def newCatalog():
-
+    #TODO: Cambiar maptype y loadfactor según se requiera
     typeofList = "ARRAY_LIST"
     catalog = {"videos": None, "categories": None, "categories_map": None}
     catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
-    catalog["categories_map"] = mp.newMap(10000,
-                                   maptype='PROBING',
-                                   loadfactor=4.0)
+    catalog["categories_map"] = mp.newMap(10000, 10007, 'CHAINING', 4.0)
     return catalog
 
 
@@ -60,12 +59,20 @@ def addVideo(catalog, video):
     Esta funcion adiciona un video a la lista de videos,
     adicionalmente lo guarda en un Map usando como llave su Id (categoría).
     """
+    #TODO: Cambiar maptype según se requiera
+    maptype = "CHAINING"
     lt.addLast(catalog['videos'], video)
-    for cate in catalog["categories_map"]["table"]["elements"]:
-        if cate["key"] == video["category_id"]:
-            space = cate["value"]["videos"]
-            lt.addLast(space, video)
-    
+    if maptype == "PROBING":
+        for cate in catalog["categories_map"]["table"]["elements"]:
+            if cate["key"] == video["category_id"]:
+                space = cate["value"]["videos"]
+                lt.addLast(space, video)
+    else:
+        for cate in catalog["categories_map"]["table"]["elements"]:
+            if cate["key"] != None:
+                print(cate["key"], video["category_id"])
+            if cate["key"] == video["category_id"]:
+                lt.addLast(cate, video)
 
 def addCategory1(catalog, category):
     # Se adiciona la categoria a la lista de categorias

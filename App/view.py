@@ -193,6 +193,8 @@ while True:
         print("Resultados prueba ---------------------------------------------------------")
         print("Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")
         print("")
+        """for cat in catalog["categories_map"]["table"]["elements"]:
+            print(cat)"""
         
         
 

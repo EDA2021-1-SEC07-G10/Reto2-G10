@@ -94,7 +94,7 @@ def loadCategories(catalog):
         cat_name = cat_contents[0]
         cat_id = cat_contents[1]
         result = model.newCategory(cat_name, cat_id)
-            
+        
         model.addCategory2(catalog, cat_id, result)
 
 
