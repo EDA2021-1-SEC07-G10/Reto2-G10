@@ -43,13 +43,12 @@ los mismos.
 def newCatalog():
 
     typeofList = "ARRAY_LIST"
-    catalog = {"videos": None, "categories": None}
+    catalog = {"videos": None, "categories": None, "categories_map": None}
     catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories_map"] = mp.newMap(10000,
                                    maptype='PROBING',
                                    loadfactor=4.0)
-
     return catalog
 
 
@@ -62,8 +61,11 @@ def addVideo(catalog, video):
     adicionalmente lo guarda en un Map usando como llave su Id (categoría).
     """
     lt.addLast(catalog['videos'], video)
-    mp.put(catalog['categories_map'], video['category_id'], video)
-
+    for cate in catalog["categories_map"]["table"]["elements"]:
+        if cate["key"] == video["category_id"]:
+            space = cate["value"]["videos"]
+            lt.addLast(space, video)
+    
 
 def addCategory1(catalog, category):
     # Se adiciona la categoria a la lista de categorias
@@ -73,14 +75,6 @@ def addCategory1(catalog, category):
 def addCategory2(catalog, category, mapvalue):
     # Se adiciona la categoria al map de categorias
     mp.put(catalog["categories_map"], category, mapvalue)
-
-
-def fixCategoriesMap(catalog):
-    for categ in catalog["categories_map"]["table"]["elements"]:
-        print(categ)
-        if categ["key"] == None:
-            mp.remove(catalog["categories_map"], categ["key"])
-
 
 # Funciones para creacion de datos
 

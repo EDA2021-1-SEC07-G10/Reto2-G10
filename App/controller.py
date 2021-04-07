@@ -44,8 +44,8 @@ def loadData(catalog):
     """
     Carga los datos de los archivos y estos a la estructura de datos
     """
-    loadVideos(catalog)
     loadCategories(catalog)
+    loadVideos(catalog)
 
 
 def loadVideos(catalog):
@@ -64,7 +64,8 @@ def findCategoryName(catalog, category):
             category_name = contents[1]
             category_name = category_name.replace(" ", "")
             category_id = contents[0]
-    return (category_name, category_id)
+    retorno = (category_name, category_id)
+    return retorno
 
 
 def loadCategories(catalog):
@@ -76,9 +77,11 @@ def loadCategories(catalog):
         cat_name = cat_contents[0]
         cat_id = cat_contents[1]
         result = model.newCategory(cat_name, cat_id)
-        model.addCategory2(catalog, cat_name, result)
-    model.fixCategoriesMap(catalog)
-    
+            
+        model.addCategory2(catalog, cat_id, result)
+    """for cate in catalog["categories_map"]["table"]["elements"]:
+        print(cate)"""
+
 
 # Funciones de ordenamiento
 
@@ -87,7 +90,7 @@ def loadCategories(catalog):
 
 def findCategoryId(catalog, category):
     for cat in catalog["categories"]["elements"]:
-        print(category)
+        #print(category)
         if (category.title()) in cat['id\tname']:
             contents = cat['id\tname'].split("\t")
             category_id = contents[0]
