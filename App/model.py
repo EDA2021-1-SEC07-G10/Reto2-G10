@@ -27,11 +27,12 @@
 
 import config as cf
 from DISClib.ADT import list as lt
-#from DISClib.DataStructures import mapstructure as mp
-from DISClib.ADT import map as mp
+from DISClib.DataStructures import mapstructure as mp
+#from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
+from DISClib.DataStructures import chaininghashtable as cht
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -47,7 +48,7 @@ def newCatalog():
     catalog = {"videos": None, "categories": None, "categories_map": None}
     catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
-    catalog["categories_map"] = mp.newMap(10000, 10007, 'CHAINING', 4.0)
+    catalog["categories_map"] = mp.newMap(10000, 10007, 'CHAINING', 4.0, None)
     return catalog
 
 
@@ -59,8 +60,7 @@ def addVideo(catalog, video):
     Esta funcion adiciona un video a la lista de videos,
     adicionalmente lo guarda en un Map usando como llave su Id (categoría).
     """
-    #TODO: Cambiar maptype según se requiera
-    maptype = "CHAINING"
+    maptype = catalog["categories_map"]["type"]
     lt.addLast(catalog['videos'], video)
     if maptype == "PROBING":
         for cate in catalog["categories_map"]["table"]["elements"]:
@@ -69,10 +69,11 @@ def addVideo(catalog, video):
                 lt.addLast(space, video)
     else:
         for cate in catalog["categories_map"]["table"]["elements"]:
-            if cate["key"] != None:
-                print(cate["key"], video["category_id"])
-            if cate["key"] == video["category_id"]:
-                lt.addLast(cate, video)
+            try:
+                if cate["first"]["info"]["key"] == video["category_id"]:
+                    lt.addLast(cate["first"]["info"]["value"]["videos"], video)
+            except:
+                pass
 
 def addCategory1(catalog, category):
     # Se adiciona la categoria a la lista de categorias
@@ -81,7 +82,10 @@ def addCategory1(catalog, category):
 
 def addCategory2(catalog, category, mapvalue):
     # Se adiciona la categoria al map de categorias
-    mp.put(catalog["categories_map"], category, mapvalue)
+    if catalog["categories_map"]['type'] == 'PROBING':
+        mp.put(catalog["categories_map"], category, mapvalue)
+    else:
+        cht.put(catalog["categories_map"], category, mapvalue)
 
 # Funciones para creacion de datos
 
