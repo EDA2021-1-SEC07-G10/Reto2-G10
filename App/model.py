@@ -48,7 +48,7 @@ def newCatalog():
     catalog = {"videos": None, "categories": None, "categories_map": None}
     catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
     catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
-    catalog["categories_map"] = mp.newMap(10000, 10007, 'PROBING', 0.30, None)
+    catalog["categories_map"] = mp.newMap(10000, 10007, 'CHAINING', 6.00, None)
     return catalog
 
 
