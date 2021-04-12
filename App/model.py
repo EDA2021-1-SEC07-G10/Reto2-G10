@@ -34,6 +34,7 @@ from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
 from DISClib.DataStructures import chaininghashtable as cht
 
+
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
 los mismos.
@@ -43,12 +44,9 @@ los mismos.
 
 
 def newCatalog():
-    #TODO: Cambiar maptype y loadfactor según se requiera
-    typeofList = "ARRAY_LIST"
-    catalog = {"videos": None, "categories": None, "categories_map": None}
-    catalog["videos"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
-    catalog["categories"] = lt.newList(typeofList, cmpfunction=cmpVideosByViews)
-    catalog["categories_map"] = mp.newMap(10000, 10007, 'CHAINING', 6.00, None)
+    catalog = {"videos": None, "categories": None}
+    catalog["videos"] = mp.newMap(1000000, 1000007, 'PROBING', 0.80, None)
+    catalog["categories"] = mp.newMap(36, 37, 'PROBING', 0.80, None)
     return catalog
 
 
@@ -57,37 +55,42 @@ def newCatalog():
 
 def addVideo(catalog, video):
     """
-    Esta funcion adiciona un video a la lista de videos,
-    adicionalmente lo guarda en un Map usando como llave su Id (categoría).
+    Esta funcion adiciona un video a la lista de videos teniendo como llave su video_id,
+    adicionalmente lo guarda en un Map usando como llave su número de categoría.
     """
-    maptype = catalog["categories_map"]["type"]
-    lt.addLast(catalog['videos'], video)
-    if maptype == "PROBING":
-        for cate in catalog["categories_map"]["table"]["elements"]:
-            if cate["key"] == video["category_id"]:
-                space = cate["value"]["videos"]
-                lt.addLast(space, video)
+    cont = mp.contains(catalog["videos"], video["video_id"])
+    if not cont:
+        structure = newVideo()
+        lt.addLast(structure["videos"], video)
+        mp.put(catalog["videos"], video["video_id"], structure)
     else:
-        for cate in catalog["categories_map"]["table"]["elements"]:
-            try:
-                if cate["first"]["info"]["key"] == video["category_id"]:
-                    lt.addLast(cate["first"]["info"]["value"]["videos"], video)
-            except:
-                pass
+        pareja = mp.get(catalog["videos"], video["video_id"])
+        llave = pareja["key"]
+        valor = pareja["value"]
+        lt.addLast(valor["videos"], video)
+        mp.put(catalog["videos"], llave, valor)
 
-def addCategory1(catalog, category):
-    # Se adiciona la categoria a la lista de categorias
-    lt.addLast(catalog['categories'], category)
+    for cate in catalog["categories"]["table"]["elements"]:
+        if cate["key"] == video["category_id"]:
+            space = cate["value"]["videos"]
+            lt.addLast(space, video)
+    
 
 
-def addCategory2(catalog, category, mapvalue):
+def addCategory(catalog, category, mapvalue):
     # Se adiciona la categoria al map de categorias
-    if catalog["categories_map"]['type'] == 'PROBING':
-        mp.put(catalog["categories_map"], category, mapvalue)
-    else:
-        cht.put(catalog["categories_map"], category, mapvalue)
+    mp.put(catalog["categories"], category, mapvalue)
+
 
 # Funciones para creacion de datos
+
+
+def newVideo():
+    video = {'videos': None,
+           'count': 0.0}
+    video["videos"] = lt.newList()
+    return video
+
 
 def newCategory(name, id):
     """

@@ -24,8 +24,11 @@ import config as cf
 import sys
 import controller
 from DISClib.ADT import list as lt
+from DISClib.DataStructures import mapstructure as mp
 assert cf
-
+import sys
+default_limit = 1000
+sys.setrecursionlimit(default_limit*10)
 
 """
 La vista se encarga de la interacción con el usuario
@@ -182,18 +185,20 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
+        
         mediciones = loadData(catalog)
-        print('Videos cargados: ' + str(lt.size(catalog['videos'])))
+        print("Total de categorías cargadas: " + str(catalog["categories"]["size"]))
+        print('Total de videos cargados: ' + str(mediciones[2]))
         print("Información sobre el primer video cargado:\n")
-        video = lt.firstElement(catalog["videos"])
-        printVideoInfo(video)
+        #video = lt.firstElement(catalog["videos"])
+        #printVideoInfo(video)
         print("Las categorías cargadas y sus id son:")
-        printCategoriesList(catalog)
+        #printCategoriesList(catalog)
         print("")
         print("Resultados prueba ---------------------------------------------------------")
         print("Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")
         print("")
-        """for cat in catalog["categories_map"]["table"]["elements"]:
+        """for cat in catalog["categories"]["table"]["elements"]:
             print(cat)"""
         
         

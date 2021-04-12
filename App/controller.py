@@ -53,7 +53,7 @@ def loadData(catalog):
     start_memory = getMemory()
 
     loadCategories(catalog)
-    loadVideos(catalog)
+    count = loadVideos(catalog)
 
     stop_time = getTime()
     stop_memory = getMemory()
@@ -62,25 +62,30 @@ def loadData(catalog):
 
     delta_time = stop_time - start_time
     delta_memory = deltaMemory(start_memory, stop_memory)
-    result = [delta_time, delta_memory]
+    result = [delta_time, delta_memory, count]
     return result
 
 def loadVideos(catalog):
 
-    videosfile = (cf.data_dir + 'videos-20pct.csv').replace("\\","/")
+    videosfile = (cf.data_dir + 'videos-5pct.csv').replace("\\","/")
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
+    count = 0
     for video in input_file:
         model.addVideo(catalog, video)
+        count += 1
+    return count
 
 
-def findCategoryName(catalog, category):
-    for cat in catalog["categories"]["elements"]:
-        number = category['id\tname'][0].replace("\\", "")
-        if (number) in cat['id\tname']:
-            contents = cat['id\tname'].split("\t")
-            category_name = contents[1]
-            category_name = category_name.replace(" ", "")
-            category_id = contents[0]
+
+def findCategoryName(category):
+    newcat = category.replace("{'id\\tname': '", "")
+    defcat = newcat.replace("'}", "")
+    cat_name = defcat[defcat.index("\\t ") + 3:]
+    if cat_name[0] == " ":
+        category_name = cat_name.replace(" ", "", 1)
+    else:
+        category_name = cat_name
+    category_id = defcat[:defcat.index("\\t ")]
     retorno = (category_name, category_id)
     return retorno
 
@@ -89,12 +94,12 @@ def loadCategories(catalog):
     categoriesfile = cf.data_dir + 'category-id.csv'
     input_file = csv.DictReader(open(categoriesfile, encoding='utf-8'))
     for category in input_file:
-        model.addCategory1(catalog, category)
-        cat_contents = findCategoryName(catalog, category)
+        str_cat = str(category)
+        cat_contents = findCategoryName(str_cat)
         cat_name = cat_contents[0]
         cat_id = cat_contents[1]
         result = model.newCategory(cat_name, cat_id)
-        model.addCategory2(catalog, cat_id, result)
+        model.addCategory(catalog, cat_id, result)
 
 
 
