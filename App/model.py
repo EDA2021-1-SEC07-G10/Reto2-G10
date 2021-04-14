@@ -30,7 +30,7 @@ from DISClib.ADT import list as lt
 from DISClib.DataStructures import mapstructure as mp
 #from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
-from DISClib.Algorithms.Sorting import shellsort as sa
+from DISClib.Algorithms.Sorting import quicksort as quick
 assert cf
 from DISClib.DataStructures import chaininghashtable as cht
 
@@ -44,7 +44,7 @@ los mismos.
 
 
 def newCatalog():
-    catalog = {"videos": None, "categories": None}
+    catalog = {"videos": None, "categories": None, "info": None}
     catalog["videos"] = mp.newMap(1000000, 1000007, 'PROBING', 0.80, None)
     catalog["categories"] = mp.newMap(36, 37, 'PROBING', 0.80, None)
     return catalog
@@ -98,7 +98,6 @@ def newCategory(name, id):
     """
     category = {'name': '',
            'category_id': '',
-           'total_videos': 0,
            'videos': None,
            'count': 0.0}
     category['name'] = name
@@ -122,9 +121,6 @@ def cmpVideosByViews(video1, video2):
     return (int(video1["views"]) > int(video2["views"]))
 
 
-# Funciones de ordenamiento
-
-
 def cmpVideosByLikes(video1, video2):
     """
     Devuelve verdadero (True) si los 'likes' de video1 son mayores que
@@ -136,9 +132,17 @@ def cmpVideosByLikes(video1, video2):
     return (int(video1["likes"]) > int(video2["likes"]))
 
 
+def cmpVideosByTrendingdays(video1, video2):
+    return (int(video1["count"]) > int(video2["count"]))
+
+
+# Funciones principales de requerimientos
+
+
 def firstReq(catalog, data_size, country, category):
     """
     Completa el requerimiento #1
+    """
     """
     filtered = catalog.copy()
     i = 1
@@ -156,13 +160,45 @@ def firstReq(catalog, data_size, country, category):
         data_sublist = data_sublist.copy()
         return data_sublist
     except:
-        return sorted_list
+        return sorted_list"""
+    ##########################################################################
+    """
+    try:
+        for video in catalog["videos"]["table"]["elements"]:
+            print(video)
+            input("x")
+    except:
+        pass
+    for video in catalog["videos"]["table"]["elements"]:
+        for each in lt.iterator(video["value"]["videos"]):
+            if each["country"]"""
+    ##########
+    for cate in catalog["categories"]["table"]["elements"]:
+        try:
+            if int(cate["key"]) == int(category):
+                info = cate["value"]["videos"]
+                break
+        except:
+            pass
 
+    new_list = lt.newList()
+    for video in lt.iterator(info):
+        if str(video["country"]).lower() == str(country).lower():
+            lt.addLast(new_list, video)
+    sorted_list = quick.sort(new_list, cmpVideosByViews)
+    try:
+        data_sublist = lt.subList(sorted_list, 1, data_size)
+        data_sublist = data_sublist.copy()
+        return data_sublist
+    except:
+        return sorted_list
+    
 
 def secondReq(catalog, country):
     """
     Completa el requerimiento #2
     """
+    #TODO: Terminar
     dicc = {}
     filtered = catalog.copy()
     i = 1
@@ -197,6 +233,7 @@ def thirdReq(catalog, category):
     """
     Completa el requerimiento #3
     """
+    """
     dicc = {}
     filtered = catalog.copy()
     i = 1
@@ -225,11 +262,48 @@ def thirdReq(catalog, category):
     primerosdatos = mayor[0].split("#,@,#")
     resultado = [primerosdatos[0], primerosdatos[1], mayor[1], category]
     return resultado
+    """
+    for cate in catalog["categories"]["table"]["elements"]:
+        try:
+            if int(cate["key"]) == int(category):
+                info = cate["value"]["videos"]
+                break
+        except:
+            pass
+    new_map = mp.newMap(500000, 500000, 'PROBING', 0.80, None)
+    i = 1
+    t = lt.size(info)
+    x = 0
+    while i <= t:
+        elem = lt.getElement(info, i)
+        value = {"title": elem["title"], "channel": elem["channel_title"], "count": 1}
+        key = elem["title"]
+        exists = mp.contains(new_map, key)
+        if not exists:
+            mp.put(new_map, key, value)
+        else:
+            old_value = mp.get(new_map)
+            key = elem["title"]
+            new_value = old_value["value"]["count"] = int(old_value["value"]["count"]) + 1
+            mp.put(new_map, key, new_value)
+            print("doesnt exist")
+        i += 1
+
+    new_list = lt.newList()
+    for element in new_map["table"]["elements"]:
+        if element["key"] != None:
+            lt.addLast(new_list, element["value"])
+    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
+    result = lt.firstElement(sorted_list)
+    result["cat"] = category
+
+    return result
 
 
 def fourthReq(catalog, data_size, country, tag):
     """
     Completa el requerimiento #4
+    """
     """
     filtered = catalog.copy()
     i = 1
@@ -247,5 +321,18 @@ def fourthReq(catalog, data_size, country, tag):
         data_sublist = data_sublist.copy()
         return data_sublist
     except:
+        return sorted_list"""
+    info = catalog["videos"]["table"]["elements"]
+    new_list = lt.newList()
+    for videos in info:
+        if videos["key"] != None:
+            for video in lt.iterator(videos["value"]["videos"]):
+                if (str(video["country"]).lower() == str(country).lower()) and ((str(tag)).lower() in (str(video["tags"])).lower()):
+                    lt.addLast(new_list, video)
+    sorted_list = quick.sort(new_list, cmpVideosByLikes)
+    try:
+        data_sublist = lt.subList(sorted_list, 1, data_size)
+        data_sublist = data_sublist.copy()
+        return data_sublist
+    except:
         return sorted_list
-    

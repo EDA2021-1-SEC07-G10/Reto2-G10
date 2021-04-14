@@ -25,6 +25,7 @@ import model
 import csv
 import time
 import tracemalloc
+from DISClib.DataStructures import mapstructure as mp
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -37,6 +38,7 @@ def initCatalog():
 
     catalog = model.newCatalog()
     return catalog
+
 
 # Funciones para la carga de datos
 
@@ -62,19 +64,19 @@ def loadData(catalog):
 
     delta_time = stop_time - start_time
     delta_memory = deltaMemory(start_memory, stop_memory)
-    result = [delta_time, delta_memory, count]
+    result = [delta_time, delta_memory]
+    catalog["info"] = {"cantidad_videos": count}
     return result
 
-def loadVideos(catalog):
 
-    videosfile = (cf.data_dir + 'videos-5pct.csv').replace("\\","/")
+def loadVideos(catalog):
+    videosfile = (cf.data_dir + 'videos-small.csv').replace("\\","/")
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     count = 0
     for video in input_file:
         model.addVideo(catalog, video)
         count += 1
     return count
-
 
 
 def findCategoryName(category):
@@ -109,11 +111,12 @@ def loadCategories(catalog):
 
 
 def findCategoryId(catalog, category):
-    for cat in catalog["categories"]["elements"]:
-        if (category.title()) in cat['id\tname']:
-            contents = cat['id\tname'].split("\t")
-            category_id = contents[0]
-    return category_id
+    for cat in catalog["categories"]["table"]["elements"]:
+        try:
+            if cat["value"]["name"] == category:
+                return cat["value"]["category_id"]
+        except:
+            pass
 
 
 def firstReq(catalog, data_size, country, category):

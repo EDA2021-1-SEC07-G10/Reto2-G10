@@ -42,11 +42,11 @@ def printMenu():
     print("------------------------------------------------------")
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    #print("2- Req. 1: Consultar n videos con más views en un país, por categoría")
-    #print("3- Req. 2: Consultar video que más días ha sido trending en un país")
-    #print("4- Req. 3: Consultar video que más dias ha sido trending, por categoría")
-    #print("5- Req. 4: Consultar n videos con más likes en un país, por tag")
-    #print("0- Salir")
+    print("2- Req. 1: Consultar n videos con más views en un país, por categoría")
+    print("3- Req. 2: Consultar video que más días ha sido trending en un país")
+    print("4- Req. 3: Consultar video que más dias ha sido trending, por categoría")
+    print("5- Req. 4: Consultar n videos con más likes en un país, por tag")
+    print("0- Salir")
 
 
 def initCatalog():
@@ -67,6 +67,7 @@ def printVideoInfo(video):
     """
     Imprime la información principal de un video
     """
+    #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
     print("Título: " + video["title"])
     print("Canal: " + video["channel_title"])
@@ -81,6 +82,7 @@ def printVideoInfo1(video):
     """
     Imprime la información principal de un video
     """
+    #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
     print("Título: " + video["title"])
     print("Canal: " + video["channel_title"])
@@ -95,6 +97,7 @@ def printVideoInfo2(info):
     """
     Imprime la información principal de un video
     """
+    #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
     print("Título: " + info[0])
     print("Canal: " + info[1])
@@ -105,17 +108,19 @@ def printVideoInfo3(info):
     """
     Imprime la información principal de un video
     """
+    #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
-    print("Título: " + info[0])
-    print("Canal: " + info[1])
-    print("Identificador de categoría: " + str(info[3]))
-    print("Número de días como tendencia: " + str(info[2]))
+    print("Título: " + info["title"])
+    print("Canal: " + info["channel"])
+    print("Identificador de categoría: " + str(info["cat"]))
+    print("Número de días como tendencia: " + str(info["count"]))
 
 
 def printVideoInfo4(video):
     """
     Imprime la información principal de un video
     """
+    #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
     print("Título: " + video["title"])
     print("Canal: " + video["channel_title"])
@@ -126,20 +131,14 @@ def printVideoInfo4(video):
     print("Tags: " + video["tags"])
 
 
-def printCategoriesList(catalog):
-    "Imprime la lista de categorías"
-    for category in lt.iterator(catalog['categories']):
-        idpluscategory = category["id\tname"].split("\t ")
-        print(idpluscategory[0], idpluscategory[1])
-
-
 def askForDataSize(catalog):
     """
     Pregunta al usuario el tamaño de la muestra a comparar y valida la cantidad
     """
+    #TODO: Eliminar o ajustar
     data_size = int(input("Número de videos que se quiere listar: "))
-    if data_size > int(lt.size(catalog['videos'])):
-        print("Error: valor excede tamaño de los datos cargados.")
+    if data_size > int(catalog["info"]["cantidad_videos"]):
+        print("> Error: valor excede tamaño de los datos cargados.")
         print("> Tip: Intente con un valor más pequeño o ejecute la opción 1 nuevamente antes de intentarlo.")
         askForDataSize(catalog)
     else:
@@ -157,6 +156,7 @@ def secondReq(catalog, country):
     """
     Solicita al controller la información del requerimiento 2
     """
+    #TODO: Eliminar o ajustar
     return controller.secondReq(catalog,country)
 
 
@@ -164,6 +164,7 @@ def thirdReq(catalog, category):
     """
     Solicita al controller la información del requerimiento 3
     """
+    #TODO: Eliminar o ajustar
     return controller.thirdReq(catalog, category)
 
 
@@ -171,6 +172,7 @@ def fourthReq(catalog, data_size, country, tag):
     """
     Solicita al controller la información del requerimiento 3
     """
+    #TODO: Eliminar o ajustar
     return controller.fourthReq(catalog, data_size, country, tag)
 
 
@@ -185,23 +187,12 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
-        
         mediciones = loadData(catalog)
+        print("------------------------------------------------------")
         print("Total de categorías cargadas: " + str(catalog["categories"]["size"]))
-        print('Total de videos cargados: ' + str(mediciones[2]))
-        print("Información sobre el primer video cargado:\n")
-        #video = lt.firstElement(catalog["videos"])
-        #printVideoInfo(video)
-        print("Las categorías cargadas y sus id son:")
-        #printCategoriesList(catalog)
-        print("")
-        print("Resultados prueba ---------------------------------------------------------")
-        print("Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")
-        print("")
-        """for cat in catalog["categories"]["table"]["elements"]:
-            print(cat)"""
-        
-        
+        print('Total de videos cargados: ' + str(catalog["info"]["cantidad_videos"]))
+        print("Tiempo y memoria consumidos en la carga:")
+        print("Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")        
 
     elif int(inputs[0]) == 2:
         print("------------------------------------------------------")
@@ -210,12 +201,13 @@ while True:
         country = input("Indique el país: " )
         category = input("Indique la categoría: ")
         result = firstReq(catalog, data_size, country, category)
-        for video in result["elements"]:
+        for video in lt.iterator(result):
             printVideoInfo1(video)
 
     elif int(inputs[0]) == 3:
         print("------------------------------------------------------")
         print("Req. #2: Consultar video que más días ha sido trending en un país")
+        #TODO: Eliminar o ajustar
         country = input("Indique el país: ")
         result = secondReq(catalog, country)
         printVideoInfo2(result)
@@ -223,6 +215,7 @@ while True:
     elif int(inputs[0]) == 4:
         print("------------------------------------------------------")
         print("Req. #3: Consultar video que más dias ha sido trending, por categoría")
+        #TODO: Eliminar o ajustar
         category = input("Indique la categoría: ")
         result = thirdReq(catalog, category)
         printVideoInfo3(result)
@@ -231,11 +224,12 @@ while True:
     elif int(inputs[0]) == 5:
         print("------------------------------------------------------")
         print("Req. #4: Consultar n videos con más likes en un país, por tag")
+        #TODO: Eliminar o ajustar
         data_size = askForDataSize(catalog)
         country = input("Indique el país: " )
         tag = str(input("Indique el tag: " ))
         result = fourthReq(catalog, data_size, country, tag)
-        for video in result["elements"]:
+        for video in lt.iterator(result):
             printVideoInfo4(video)
 
     else:
