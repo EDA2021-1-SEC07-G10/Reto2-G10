@@ -25,6 +25,8 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 from DISClib.DataStructures import mapstructure as mp
+import time
+import tracemalloc
 assert cf
 import sys
 default_limit = 1000
@@ -39,7 +41,8 @@ operación solicitada
 
 
 def printMenu():
-    print("------------------------------------------------------")
+    print("")
+    print("******************************************************")
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
     print("2- Req. 1: Consultar n videos con más views en un país, por categoría")
@@ -99,10 +102,10 @@ def printVideoInfo2(info):
     """
     #TODO: Eliminar o ajustar
     print("------------------------------------------------------")
-    print("Título: " + info[0])
-    print("Canal: " + info[1])
-    print("Número de días como tendencia: " + str(info[2]))
-
+    print("Título: " + info["title"])
+    print("Canal: " + info["channel"])
+    print("País: " + str(info["country"]))
+    print("Número de días como tendencia: " + str(info["count"]))
 
 def printVideoInfo3(info):
     """
@@ -185,53 +188,123 @@ while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar: ')
     if int(inputs[0]) == 1:
+        print("")
+        print("******************************************************")
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
         mediciones = loadData(catalog)
-        print("------------------------------------------------------")
         print("Total de categorías cargadas: " + str(catalog["categories"]["size"]))
-        print('Total de videos cargados: ' + str(catalog["info"]["cantidad_videos"]))
-        print("Tiempo y memoria consumidos en la carga:")
-        print("Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")        
+        print('Total de videos cargados: ' + str(catalog["info"]["cantidad_videos"]))       
 
     elif int(inputs[0]) == 2:
-        print("------------------------------------------------------")
+        print("")
+        print("******************************************************")
         print("Req. #1: Consultar n videos con más views en un país, por categoría")
         data_size = askForDataSize(catalog)
         country = input("Indique el país: " )
         category = input("Indique la categoría: ")
+
+        tracemalloc.start()
+        delta_time = -1.0
+        delta_memory = -1.0
+        start_time = controller.getTime()
+        start_memory = controller.getMemory()
         result = firstReq(catalog, data_size, country, category)
+        stop_time = controller.getTime()
+        stop_memory = controller.getMemory()
+        tracemalloc.stop()
+        delta_time = stop_time - start_time
+        delta_memory = controller.deltaMemory(start_memory, stop_memory)
+        mediciones = [delta_time, delta_memory]
+
         for video in lt.iterator(result):
             printVideoInfo1(video)
+        
+        print("------------------------------------------------------")
+        print("> Tiempo y memoria consumidos:")
+        print("> Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}") 
 
     elif int(inputs[0]) == 3:
-        print("------------------------------------------------------")
+        print("")
+        print("******************************************************")
         print("Req. #2: Consultar video que más días ha sido trending en un país")
-        #TODO: Eliminar o ajustar
         country = input("Indique el país: ")
+
+        tracemalloc.start()
+        delta_time = -1.0
+        delta_memory = -1.0
+        start_time = controller.getTime()
+        start_memory = controller.getMemory()
         result = secondReq(catalog, country)
+        stop_time = controller.getTime()
+        stop_memory = controller.getMemory()
+        tracemalloc.stop()
+        delta_time = stop_time - start_time
+        delta_memory = controller.deltaMemory(start_memory, stop_memory)
+        mediciones = [delta_time, delta_memory]
+
         printVideoInfo2(result)
+
+        print("------------------------------------------------------")
+        print("> Tiempo y memoria consumidos:")
+        print("> Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}") 
     
     elif int(inputs[0]) == 4:
-        print("------------------------------------------------------")
+        print("")
+        print("******************************************************")
         print("Req. #3: Consultar video que más dias ha sido trending, por categoría")
-        #TODO: Eliminar o ajustar
         category = input("Indique la categoría: ")
+
+        tracemalloc.start()
+        delta_time = -1.0
+        delta_memory = -1.0
+        start_time = controller.getTime()
+        start_memory = controller.getMemory()        
         result = thirdReq(catalog, category)
+        stop_time = controller.getTime()
+        stop_memory = controller.getMemory()
+        tracemalloc.stop()
+        delta_time = stop_time - start_time
+        delta_memory = controller.deltaMemory(start_memory, stop_memory)
+        mediciones = [delta_time, delta_memory]
+
         printVideoInfo3(result)
     
+        print("------------------------------------------------------")
+        print("> Tiempo y memoria consumidos:")
+        print("> Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")  
 
     elif int(inputs[0]) == 5:
-        print("------------------------------------------------------")
+        print("")
+        print("******************************************************")
         print("Req. #4: Consultar n videos con más likes en un país, por tag")
-        #TODO: Eliminar o ajustar
         data_size = askForDataSize(catalog)
         country = input("Indique el país: " )
         tag = str(input("Indique el tag: " ))
+
+        tracemalloc.start()
+        delta_time = -1.0
+        delta_memory = -1.0
+        start_time = controller.getTime()
+        start_memory = controller.getMemory() 
         result = fourthReq(catalog, data_size, country, tag)
+        stop_time = controller.getTime()
+        stop_memory = controller.getMemory()
+        tracemalloc.stop()
+        delta_time = stop_time - start_time
+        delta_memory = controller.deltaMemory(start_memory, stop_memory)
+        mediciones = [delta_time, delta_memory]
+
         for video in lt.iterator(result):
             printVideoInfo4(video)
+        
+        print("------------------------------------------------------")
+        print("> Tiempo y memoria consumidos:")
+        print("> Tiempo [ms]: ", f"{mediciones[0]:.3f}", " || ", "Memoria [kB]: ", f"{mediciones[1]:.3f}")         
 
     else:
+        print("")
+        print("¡Hasta pronto!")
+        print("")
         sys.exit(0)
 sys.exit(0)

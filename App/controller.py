@@ -23,9 +23,9 @@
 import config as cf
 import model
 import csv
+from DISClib.DataStructures import mapstructure as mp
 import time
 import tracemalloc
-from DISClib.DataStructures import mapstructure as mp
 
 """
 El controlador se encarga de mediar entre la vista y el modelo.
@@ -47,26 +47,9 @@ def loadData(catalog):
     """
     Carga los datos de los archivos y estos a la estructura de datos
     """
-    tracemalloc.start()
-    delta_time = -1.0
-    delta_memory = -1.0
-
-    start_time = getTime()
-    start_memory = getMemory()
-
     loadCategories(catalog)
     count = loadVideos(catalog)
-
-    stop_time = getTime()
-    stop_memory = getMemory()
-
-    tracemalloc.stop()
-
-    delta_time = stop_time - start_time
-    delta_memory = deltaMemory(start_memory, stop_memory)
-    result = [delta_time, delta_memory]
     catalog["info"] = {"cantidad_videos": count}
-    return result
 
 
 def loadVideos(catalog):
@@ -113,7 +96,7 @@ def loadCategories(catalog):
 def findCategoryId(catalog, category):
     for cat in catalog["categories"]["table"]["elements"]:
         try:
-            if cat["value"]["name"] == category:
+            if (cat["value"]["name"]).lower() == category.lower():
                 return cat["value"]["category_id"]
         except:
             pass

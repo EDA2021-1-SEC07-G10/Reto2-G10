@@ -143,36 +143,6 @@ def firstReq(catalog, data_size, country, category):
     """
     Completa el requerimiento #1
     """
-    """
-    filtered = catalog.copy()
-    i = 1
-    t = lt.size(filtered["videos"])
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        if (elem["country"].lower()) != (country.lower()) or elem["category_id"] != category:
-            lt.deleteElement(filtered["videos"], i)
-            t -= 1
-            i -= 1
-        i += 1
-    sorted_list = quick.sort(filtered["videos"], cmpVideosByViews)
-    try:
-        data_sublist = lt.subList(sorted_list, 1, data_size)
-        data_sublist = data_sublist.copy()
-        return data_sublist
-    except:
-        return sorted_list"""
-    ##########################################################################
-    """
-    try:
-        for video in catalog["videos"]["table"]["elements"]:
-            print(video)
-            input("x")
-    except:
-        pass
-    for video in catalog["videos"]["table"]["elements"]:
-        for each in lt.iterator(video["value"]["videos"]):
-            if each["country"]"""
-    ##########
     for cate in catalog["categories"]["table"]["elements"]:
         try:
             if int(cate["key"]) == int(category):
@@ -198,70 +168,35 @@ def secondReq(catalog, country):
     """
     Completa el requerimiento #2
     """
-    #TODO: Terminar
-    dicc = {}
-    filtered = catalog.copy()
-    i = 1
-    t = lt.size(filtered["videos"])
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        if (elem["country"].lower()) != (country.lower()):
-            lt.deleteElement(filtered["videos"], i)
-            t -= 1
-            i -= 1
-        i += 1
-    i = 1
-    t = lt.size(filtered["videos"])
-    x = 0
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        titulo = (elem["title"] + "#,@,#" + elem["channel_title"])
-        if titulo not in dicc:
-            dicc[titulo] = 1
-            x += 1
-        else:
-            dicc[titulo] += 1
-        i += 1
-    dicc_sort = sorted(dicc.items(), key=operator.itemgetter(1), reverse=True)
-    mayor = dicc_sort[0]
-    primerosdatos = mayor[0].split("#,@,#")
-    resultado = [primerosdatos[0], primerosdatos[1], mayor[1]]
-    return resultado
+    new_map = mp.newMap(500000, 500000, 'PROBING', 0.80, None)
+    for videos in catalog["videos"]["table"]["elements"]:
+        if videos["key"] != None:
+            for video in lt.iterator(videos["value"]["videos"]):
+                if str(video["country"]).lower() == str(country).lower():
+                    value = {"title": video["title"], "channel": video["channel_title"], "count": 1}
+                    key = video["title"]
+                    exists = mp.contains(new_map, key)
+                    if not exists:
+                        mp.put(new_map, key, value)
+                    else:
+                        old_value = mp.get(new_map, key)
+                        new_value = old_value["value"]["count"] = int(old_value["value"]["count"]) + 1
+                        mp.put(new_map, key, new_value)
+    
+    new_list = lt.newList()
+    for element in new_map["table"]["elements"]:
+        if element["key"] != None:
+            lt.addLast(new_list, element["value"])
+    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
+    result = lt.firstElement(sorted_list)
+    result["country"] = country
+
+    return result
 
 
 def thirdReq(catalog, category):
     """
     Completa el requerimiento #3
-    """
-    """
-    dicc = {}
-    filtered = catalog.copy()
-    i = 1
-    t = lt.size(filtered["videos"])
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        if elem["category_id"] != category:
-            lt.deleteElement(filtered["videos"], i)
-            t -= 1
-            i -= 1
-        i += 1
-    i = 1
-    t = lt.size(filtered["videos"])
-    x = 0
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        titulo = (elem["title"] + "#,@,#" + elem["channel_title"])
-        if titulo not in dicc:
-            dicc[titulo] = 1
-            x += 1
-        else:
-            dicc[titulo] += 1
-        i += 1
-    dicc_sort = sorted(dicc.items(), key=operator.itemgetter(1), reverse=True)
-    mayor = dicc_sort[0]
-    primerosdatos = mayor[0].split("#,@,#")
-    resultado = [primerosdatos[0], primerosdatos[1], mayor[1], category]
-    return resultado
     """
     for cate in catalog["categories"]["table"]["elements"]:
         try:
@@ -282,11 +217,10 @@ def thirdReq(catalog, category):
         if not exists:
             mp.put(new_map, key, value)
         else:
-            old_value = mp.get(new_map)
+            old_value = mp.get(new_map, key)
             key = elem["title"]
             new_value = old_value["value"]["count"] = int(old_value["value"]["count"]) + 1
             mp.put(new_map, key, new_value)
-            print("doesnt exist")
         i += 1
 
     new_list = lt.newList()
@@ -304,24 +238,6 @@ def fourthReq(catalog, data_size, country, tag):
     """
     Completa el requerimiento #4
     """
-    """
-    filtered = catalog.copy()
-    i = 1
-    t = lt.size(filtered["videos"])
-    while i <= t:
-        elem = lt.getElement(filtered["videos"], i)
-        if (elem["country"].lower()) != (country.lower()) or tag not in elem["tags"]:
-            lt.deleteElement(filtered["videos"], i)
-            t -= 1
-            i -= 1
-        i += 1
-    sorted_list = quick.sort(filtered["videos"], cmpVideosByLikes)
-    try:
-        data_sublist = lt.subList(sorted_list, 1, data_size)
-        data_sublist = data_sublist.copy()
-        return data_sublist
-    except:
-        return sorted_list"""
     info = catalog["videos"]["table"]["elements"]
     new_list = lt.newList()
     for videos in info:
