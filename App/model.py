@@ -33,6 +33,7 @@ from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import quicksort as quick
 assert cf
 from DISClib.DataStructures import chaininghashtable as cht
+from os import system
 
 
 """
@@ -45,7 +46,7 @@ los mismos.
 
 def newCatalog():
     catalog = {"videos": None, "categories": None, "info": None}
-    catalog["videos"] = mp.newMap(1000000, 1000007, 'PROBING', 0.80, None)
+    catalog["videos"] = mp.newMap(400000, 400007, 'PROBING', 0.80, None)
     catalog["categories"] = mp.newMap(36, 37, 'PROBING', 0.80, None)
     return catalog
 
@@ -72,8 +73,11 @@ def addVideo(catalog, video):
 
     for cate in catalog["categories"]["table"]["elements"]:
         if cate["key"] == video["category_id"]:
-            space = cate["value"]["videos"]
-            lt.addLast(space, video)
+            try:
+                space = cate["value"]["videos"]
+                lt.addLast(space, video)
+            except:
+                pass
     
 
 
@@ -132,10 +136,6 @@ def cmpVideosByLikes(video1, video2):
     return (int(video1["likes"]) > int(video2["likes"]))
 
 
-def cmpVideosByTrendingdays(video1, video2):
-    return (int(video1["count"]) > int(video2["count"]))
-
-
 # Funciones principales de requerimientos
 
 
@@ -168,26 +168,29 @@ def secondReq(catalog, country):
     """
     Completa el requerimiento #2
     """
-    new_map = mp.newMap(500000, 500000, 'PROBING', 0.80, None)
+    
+    new_map = mp.newMap(50000, 50007, 'PROBING', 0.80, None)
     for videos in catalog["videos"]["table"]["elements"]:
         if videos["key"] != None:
             for video in lt.iterator(videos["value"]["videos"]):
                 if str(video["country"]).lower() == str(country).lower():
-                    value = {"title": video["title"], "channel": video["channel_title"], "count": 1}
+                    value = {"title": video["title"], "channel": video["channel_title"], "count": "1"}
+                    value = video
                     key = video["title"]
                     exists = mp.contains(new_map, key)
                     if not exists:
                         mp.put(new_map, key, value)
                     else:
-                        old_value = mp.get(new_map, key)
-                        new_value = old_value["value"]["count"] = int(old_value["value"]["count"]) + 1
-                        mp.put(new_map, key, new_value)
+                        new_value = mp.get(new_map, key)
+                        new_value["value"]["count"] = str(int(new_value["value"]["count"]) + 1)
+                        mp.put(new_map, key, new_value["value"])
     
-    new_list = lt.newList()
+    new_list = lt.newList('ARRAY_LIST', cmpfunction=cmpVideosByViews)   
     for element in new_map["table"]["elements"]:
         if element["key"] != None:
             lt.addLast(new_list, element["value"])
-    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
+
+    sorted_list = quick.sort(new_list, cmpVideosByViews)
     result = lt.firstElement(sorted_list)
     result["country"] = country
 
@@ -205,7 +208,7 @@ def thirdReq(catalog, category):
                 break
         except:
             pass
-    new_map = mp.newMap(500000, 500000, 'PROBING', 0.80, None)
+    new_map = mp.newMap(50000, 50007, 'PROBING', 0.80, None)
     i = 1
     t = lt.size(info)
     x = 0
@@ -217,17 +220,16 @@ def thirdReq(catalog, category):
         if not exists:
             mp.put(new_map, key, value)
         else:
-            old_value = mp.get(new_map, key)
+            new_value = mp.get(new_map, key)
             key = elem["title"]
-            new_value = old_value["value"]["count"] = int(old_value["value"]["count"]) + 1
-            mp.put(new_map, key, new_value)
+            new_value["value"]["count"] += 1
+            mp.put(new_map, key, new_value["value"])
         i += 1
-
     new_list = lt.newList()
     for element in new_map["table"]["elements"]:
         if element["key"] != None:
             lt.addLast(new_list, element["value"])
-    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
+    sorted_list = quick.sort(new_list, cmpVideosByViews)
     result = lt.firstElement(sorted_list)
     result["cat"] = category
 

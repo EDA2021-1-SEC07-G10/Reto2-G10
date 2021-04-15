@@ -53,7 +53,7 @@ def loadData(catalog):
 
 
 def loadVideos(catalog):
-    videosfile = (cf.data_dir + 'videos-small.csv').replace("\\","/")
+    videosfile = (cf.data_dir + 'videos-50pct.csv').replace("\\","/")
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     count = 0
     for video in input_file:

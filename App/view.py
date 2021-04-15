@@ -242,7 +242,6 @@ while True:
         delta_time = stop_time - start_time
         delta_memory = controller.deltaMemory(start_memory, stop_memory)
         mediciones = [delta_time, delta_memory]
-
         printVideoInfo2(result)
 
         print("------------------------------------------------------")
