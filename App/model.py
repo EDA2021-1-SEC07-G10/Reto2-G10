@@ -185,7 +185,6 @@ def secondReq(catalog, country):
                         mp.put(new_map, key, value)
                     else:
                         new_value = mp.get(new_map, key)
-                        print(new_value)
                         new_value["value"]["count"] = str(int(new_value["value"]["count"]) + 1)
                         mp.put(new_map, key, new_value["value"])
     
