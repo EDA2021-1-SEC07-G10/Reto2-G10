@@ -136,6 +136,10 @@ def cmpVideosByLikes(video1, video2):
     return (int(video1["likes"]) > int(video2["likes"]))
 
 
+def cmpVideosByTrendingdays(video1, video2):
+    return (int(video1["count"]) > int(video2["count"]))
+
+
 # Funciones principales de requerimientos
 
 
@@ -175,22 +179,22 @@ def secondReq(catalog, country):
             for video in lt.iterator(videos["value"]["videos"]):
                 if str(video["country"]).lower() == str(country).lower():
                     value = {"title": video["title"], "channel": video["channel_title"], "count": "1"}
-                    value = video
                     key = video["title"]
                     exists = mp.contains(new_map, key)
                     if not exists:
                         mp.put(new_map, key, value)
                     else:
                         new_value = mp.get(new_map, key)
+                        print(new_value)
                         new_value["value"]["count"] = str(int(new_value["value"]["count"]) + 1)
                         mp.put(new_map, key, new_value["value"])
     
-    new_list = lt.newList('ARRAY_LIST', cmpfunction=cmpVideosByViews)   
+    new_list = lt.newList('ARRAY_LIST', cmpfunction=cmpVideosByTrendingdays)   
     for element in new_map["table"]["elements"]:
         if element["key"] != None:
             lt.addLast(new_list, element["value"])
 
-    sorted_list = quick.sort(new_list, cmpVideosByViews)
+    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
     result = lt.firstElement(sorted_list)
     result["country"] = country
 
@@ -229,7 +233,7 @@ def thirdReq(catalog, category):
     for element in new_map["table"]["elements"]:
         if element["key"] != None:
             lt.addLast(new_list, element["value"])
-    sorted_list = quick.sort(new_list, cmpVideosByViews)
+    sorted_list = quick.sort(new_list, cmpVideosByTrendingdays)
     result = lt.firstElement(sorted_list)
     result["cat"] = category
 
